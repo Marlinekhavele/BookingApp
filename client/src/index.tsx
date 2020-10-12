@@ -1,13 +1,15 @@
 import React from "react";
 import { render } from "react-dom";
-import ApolloClient from "apollo-boost";
-import { ApolloProvider } from "@apollo/react-hooks";
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+
 import { Listings } from "./sections";
 import * as serviceWorker from "./serviceWorker";
 
 
 const client = new ApolloClient({
-  uri: "/api"
+  uri: "/api",
+  cache: new InMemoryCache(),
+
 });
 
 render(
