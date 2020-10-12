@@ -68,6 +68,7 @@ export const Listings = ({ title }: Props) => {
         <List.Item 
         actions={[<Button 
         type="primary"
+        style={{ background: "green", borderColor: "green" }}
         onClick={()=>
          handledeleteListing(listing.id)}>Delete</Button>]}>
           <List.Item.Meta
