@@ -1,10 +1,9 @@
 import React from "react";
 import { render } from "react-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
-
 import { Listings } from "./sections";
 import * as serviceWorker from "./serviceWorker";
-
+import "./styles/index.css";
 
 const client = new ApolloClient({
   uri: "/api",
