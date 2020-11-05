@@ -1,3 +1,17 @@
+## Home sharing application, inspired by sites like Airbnb. I will  use:
+
+- React for the UI
+- Apollo to create my GraphQL API & handle GraphQL requests
+- Node & Express to create my server
+- MongoDB or PostgreSQL as my database
+- handle payments with Stripe
+- authentication with OAuth 2.0 (Google Sign-In)
+- enable location searching with Google's Geocode API
+- deploy applications with Heroku
+- the entire code will be in TypeScript
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
