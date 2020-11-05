@@ -13,8 +13,6 @@ const cookieOptions = {
 };
 
 
-
-
 const logInViaGoogle = async (
   code: string,
   token: string,
