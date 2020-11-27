@@ -17,6 +17,11 @@ type Bookings {
     APARTMENT
     HOUSE
   }
+  enum ListingsFilter {
+    PRICE_LOW_TO_HIGH
+    PRICE_HIGH_TO_LOW
+  }
+
   type Listing {
     id: ID!
     title: String!
@@ -62,8 +67,8 @@ type User {
     authUrl: String!
     user(id:ID!):User!
     listing(id:ID!):Listing!
-    listings:String!
-  }
+    listings(filter: ListingsFilter!, limit: Int!, page: Int!): Listings!
+   }
 
   type Mutation {
     logIn(input: LogInInput): Viewer!
