@@ -65,6 +65,10 @@ type User {
   input LogInInput {
     code: String!
   }
+  
+  input ConnectStripeInput {
+    code: String!
+  }
 
   type Query {
     authUrl: String!
@@ -76,5 +80,7 @@ type User {
   type Mutation {
     logIn(input: LogInInput): Viewer!
     logOut: Viewer!
+    connectStripe(input: ConnectStripeInput!): Viewer!
+    disconnectStripe: Viewer!
   }
 `;

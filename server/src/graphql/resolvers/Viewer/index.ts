@@ -160,6 +160,12 @@ export const viewerResolvers: IResolvers = {
       }
     }
   },
+  connectStripe: (): Viewer => {
+    return { didRequest: true };
+  },
+  disconnectStripe: (): Viewer => {
+    return { didRequest: true };
+  },
   Viewer: {
     id: (viewer: Viewer): string | undefined => {
       return viewer._id;
