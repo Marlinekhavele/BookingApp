@@ -103,8 +103,7 @@ const logInViaCookie = async (
     { returnOriginal: false }
   );
 
-  let viewer = updateRes.value;
-
+  const viewer = updateRes.value;
   if (!viewer) {
     res.clearCookie("viewer", cookieOptions);
   }
@@ -145,13 +144,17 @@ export const viewerResolvers: IResolvers = {
           token: viewer.token,
           avatar: viewer.avatar,
           walletId: viewer.walletId,
-          didRequest: true
+          didRequest: true,
         };
       } catch (error) {
         throw new Error(`Failed to log in: ${error}`);
       }
     },
-    logOut: (_root: undefined, _args: {}, { res }: { res: Response }): Viewer => {
+    logOut: (
+      _root: undefined,
+      _args: {},
+      { res }: { res: Response }
+    ): Viewer => {
       try {
         res.clearCookie("viewer", cookieOptions);
         return { didRequest: true };

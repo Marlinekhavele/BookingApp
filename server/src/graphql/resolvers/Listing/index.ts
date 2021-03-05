@@ -8,20 +8,10 @@ import {
   ListingArgs,
   ListingBookingsArgs,
   ListingBookingsData,
-  // ListingsArgs,
-  // ListingsData,
-  // ListingsFilter,
-  // ListingsQuery,
-  // HostListingInput,
-  // HostListingArgs,
-  // AutoCompleteArgs,
-  // AutoCompleteResult,
-  // CityAndAdmin,
-  // CityAndAdminResults
 } from "./types";
 export const listingResolvers: IResolvers = {
   Query: {
-    listing: async (
+    listings: async (
       _root: undefined,
       { id }: ListingArgs,
       { db, req }: { db: Database; req: Request }
