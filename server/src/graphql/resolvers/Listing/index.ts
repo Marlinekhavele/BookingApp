@@ -1,17 +1,13 @@
 import { IResolvers } from "apollo-server-express";
 import { Request } from "express";
 import { ObjectId } from "mongodb";
-// import {  Google } from "../../../lib/api";
 import { Database, Listing, User } from "../../../lib/types";
 import { authorize } from "../../../lib/utils";
-import {
-  ListingArgs,
-  ListingBookingsArgs,
-  ListingBookingsData,
-} from "./types";
+import { ListingArgs, ListingBookingsArgs, ListingBookingsData } from "./types";
+
 export const listingResolvers: IResolvers = {
   Query: {
-    listings: async (
+    listing: async (
       _root: undefined,
       { id }: ListingArgs,
       { db, req }: { db: Database; req: Request }

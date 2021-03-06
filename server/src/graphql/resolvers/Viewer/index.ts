@@ -1,19 +1,17 @@
 import crypto from "crypto";
-import { Request,Response } from "express";
+import { Response, Request } from "express";
 import { IResolvers } from "apollo-server-express";
-import {Google, Stripe} from "../../../lib/api";
-import { Viewer,Database,User } from "../../../lib/types";
-import { LogInArgs, ConnectStripeArgs } from "./types"
+import { Google, Stripe } from "../../../lib/api";
+import { Viewer, Database, User } from "../../../lib/types";
+import { LogInArgs, ConnectStripeArgs } from "./types";
 import { authorize } from "../../../lib/utils";
-
 
 const cookieOptions = {
   httpOnly: true,
   sameSite: true,
   signed: true,
-  secure: process.env.NODE_ENV === "development" ? false : true
+  secure: process.env.NODE_ENV === "development" ? false : true,
 };
-
 
 const logInViaGoogle = async (
   code: string,
@@ -31,14 +29,18 @@ const logInViaGoogle = async (
   const userNamesList = user.names && user.names.length ? user.names : null;
   const userPhotosList = user.photos && user.photos.length ? user.photos : null;
   const userEmailsList =
-    user.emailAddresses && user.emailAddresses.length ? user.emailAddresses : null;
+    user.emailAddresses && user.emailAddresses.length
+      ? user.emailAddresses
+      : null;
 
   // User Display Name
   const userName = userNamesList ? userNamesList[0].displayName : null;
 
   // User Id
   const userId =
-    userNamesList && userNamesList[0].metadata && userNamesList[0].metadata.source
+    userNamesList &&
+    userNamesList[0].metadata &&
+    userNamesList[0].metadata.source
       ? userNamesList[0].metadata.source.id
       : null;
 
@@ -53,7 +55,6 @@ const logInViaGoogle = async (
   if (!userId || !userName || !userAvatar || !userEmail) {
     throw new Error("Google login error");
   }
-
   const updateRes = await db.users.findOneAndUpdate(
     { _id: userId },
     {
@@ -61,8 +62,8 @@ const logInViaGoogle = async (
         name: userName,
         avatar: userAvatar,
         contact: userEmail,
-        token
-      }
+        token,
+      },
     },
     { returnOriginal: false }
   );
@@ -77,18 +78,17 @@ const logInViaGoogle = async (
       contact: userEmail,
       income: 0,
       bookings: [],
-      listings: []
+      listings: [],
     });
-
     viewer = insertResult.ops[0];
   }
-
-  res.cookie("viewer",userId,{
+  // After User is logged in
+  res.cookie("viewer", userId, {
     ...cookieOptions,
-    maxAge: 365 * 24 * 60 * 60 * 1000
-  })
-  return viewer;
+    maxAge: 365 * 24 * 60 * 60 * 1000,
+  });
 
+  return viewer;
 };
 
 const logInViaCookie = async (
@@ -107,10 +107,8 @@ const logInViaCookie = async (
   if (!viewer) {
     res.clearCookie("viewer", cookieOptions);
   }
-
   return viewer;
 };
-
 export const viewerResolvers: IResolvers = {
   Query: {
     authUrl: (): string => {
@@ -119,11 +117,12 @@ export const viewerResolvers: IResolvers = {
       } catch (error) {
         throw new Error(`Failed to query Google Auth Url: ${error}`);
       }
-    }
+    },
   },
   Mutation: {
+    // Fired in two cases(from front end): When User signs in with Google Oauth Url and User's cookie session.
     logIn: async (
-      _root: undefined,
+      __root: undefined,
       { input }: LogInArgs,
       { db, req, res }: { db: Database; req: Request; res: Response }
     ): Promise<Viewer> => {
@@ -197,7 +196,7 @@ export const viewerResolvers: IResolvers = {
           token: viewer.token,
           avatar: viewer.avatar,
           walletId: viewer.walletId,
-          didRequest: true
+          didRequest: true,
         };
       } catch (error) {
         throw new Error(`Failed to connect with Stripe: ${error}`);
@@ -237,13 +236,13 @@ export const viewerResolvers: IResolvers = {
         throw new Error(`Failed to disconnect with Stripe: ${error}`);
       }
     },
-    Viewer: {
-      id: (viewer: Viewer): string | undefined => {
-        return viewer._id;
-      },
-      hasWallet: (viewer: Viewer): boolean | undefined => {
-        return viewer.walletId ? true : undefined;
-      },
+  },
+  Viewer: {
+    id: (viewer: Viewer): string | undefined => {
+      return viewer._id;
+    },
+    hasWallet: (viewer: Viewer): boolean | undefined => {
+      return viewer.walletId ? true : undefined;
     },
   },
 };
