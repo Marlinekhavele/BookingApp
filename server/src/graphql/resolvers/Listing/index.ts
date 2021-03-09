@@ -1,7 +1,7 @@
 import { IResolvers } from "apollo-server-express";
 import { Request } from "express";
 import { ObjectId } from "mongodb";
-import { Cloudinary, Google } from "../../../lib/api";
+import {  Google } from "../../../lib/api";
 import { Database, Listing, ListingType, User } from "../../../lib/types";
 import { authorize } from "../../../lib/utils";
 import {
@@ -14,10 +14,10 @@ import {
   ListingsQuery,
   HostListingInput,
   HostListingArgs,
-  AutoCompleteArgs,
-  AutoCompleteResult,
-  CityAndAdmin,
-  CityAndAdminResults
+  // AutoCompleteArgs,
+  // AutoCompleteResult,
+  // CityAndAdmin,
+  // CityAndAdminResults
 } from "./types";
 
 const verifyHostListingInput = ({
@@ -41,93 +41,7 @@ const verifyHostListingInput = ({
 };
 
 export const listingResolvers: IResolvers = {
-  AutoCompleteResult: {
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    __resolveType: (obj:any) => {
-      if(obj.hasOwnProperty('region')) {
-        return "Listings";
-      }
-      if(obj.hasOwnProperty('dummy')){
-        return "CityAndAdminResults";
-      }      
-      return null;
-    }
-  },
   Query: {
-    autoCompleteOptions: async (
-      _root: undefined,
-      { text }: AutoCompleteArgs,
-      { db }: { db: Database }
-    ): Promise<AutoCompleteResult> => {
-      try {
-
-        // The normal case
-        const addressData: ListingsData = {
-          total: 0,
-          result: [],
-          region: null,
-        };
-
-        // WHen we're trying to magically return cities without repeating ourselves.
-        const cityAdminData:CityAndAdminResults = {
-          total: 0,
-          result: [],
-          dummy:0
-        };
-
-        // First we're going try to match with states
-
-        const groupCity = await db.listings.aggregate([
-          {
-            $search: {
-              autocomplete: {
-                query: `${text}`,
-                path: "city",
-              },
-            },
-          },
-          {
-            $group: {
-              _id: { admin: "$admin", city: "$city" },
-            },
-          },
-        ]);
-
-        const groupCityResults = await groupCity.toArray();
-        const groupCityResultsLenght = groupCityResults.length
-        const cityMatchText = groupCityResultsLenght > 0;
-        
-        // If we succesfully query for cities ...
-        if(cityMatchText){
-          const groupCityFormatResults: CityAndAdmin[] = groupCityResults.map((result:any) => {
-            return { admin:result._id.admin, city: result._id.city }
-          });
-          cityAdminData.result = groupCityFormatResults;
-          cityAdminData.total = groupCityResultsLenght;
-
-          return cityAdminData;
-        }
-        // SEARCH FOR ADDRESS VIA TEXT
-        const addressResult = await db.listings.aggregate([
-          {
-            $search: {
-              autocomplete: {
-                query: `${text}`,
-                path: "address",
-              },
-            },
-          },
-        ]);
-        const limitAddressResult = addressResult.limit(5);
-        const listings = await limitAddressResult.toArray();
-        addressData.result = listings;
-        addressData.total = listings.length;
-
-        return addressData;
-      } catch (error) {
-        throw new Error(`Failed to search(autocomplete) listings : ${error}`);
-      }
-    },
     listing: async (
       _root: undefined,
       { id }: ListingArgs,
@@ -217,13 +131,13 @@ export const listingResolvers: IResolvers = {
         throw new Error("invalid address input");
       }
 
-      const imageUrl = await Cloudinary.upload(input.image);
-      console.log("imageUrl", imageUrl);
+      // const imageUrl = await Cloudinary.upload(input.image);
+      // console.log("imageUrl", imageUrl);
 
       const insertResult = await db.listings.insertOne({
         _id: new ObjectId(),
         ...input,
-        image: imageUrl,
+        // image: imageUrl,
         bookings: [],
         bookingsIndex: {},
         country,
