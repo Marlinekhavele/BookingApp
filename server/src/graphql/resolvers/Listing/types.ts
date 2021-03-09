@@ -1,4 +1,4 @@
-import {Booking,Listing} from '../../../lib/types';
+import {Booking,Listing, ListingType} from '../../../lib/types';
 
 export enum ListingsFilter{
 
@@ -41,4 +41,18 @@ export interface ListingsQuery {
   country?: string;
   admin?: string;
   city?: string;
+}
+
+export interface HostListingInput {
+  title: string;
+  description: string;
+  image: string;
+  type: ListingType;
+  address: string;
+  price: number;
+  numOfGuests: number;
+}
+
+export interface HostListingArgs {
+  input: HostListingInput;
 }
