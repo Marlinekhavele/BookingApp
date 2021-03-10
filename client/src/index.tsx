@@ -12,7 +12,12 @@ import { setContext } from "@apollo/client/link/context";
 
 import {Affix , Spin,Layout } from "antd";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import {AppHeader, Home, Host, Listing, Listings,Login, NotFound,Stripe, User } from "./sections";
+import {
+  AppHeader,
+  Home,
+  WrappedHost as Host,
+  Listing, Listings, Login, NotFound, Stripe, User
+} from "./sections";
 import {LOG_IN} from "./lib/graphql/mutations";
 import {
   LogIn as LogInData,
