@@ -1,9 +1,9 @@
-import { IResolvers } from "apollo-server-express";
-import { Request } from "express";
-import { ObjectId } from "mongodb";
-import {  Google } from "../../../lib/api";
-import { Database, Listing, ListingType, User } from "../../../lib/types";
-import { authorize } from "../../../lib/utils";
+import { IResolvers } from 'apollo-server-express';
+import { ObjectId } from 'mongodb';
+import { Request } from 'express';
+import { authorize } from '../../../lib/utils';
+import { Cloudinary, Google } from '../../../lib/api';
+import { Database, Listing, ListingType, User } from '../../../lib/types';
 import {
   ListingArgs,
   ListingBookingsArgs,
@@ -12,31 +12,22 @@ import {
   ListingsData,
   ListingsFilter,
   ListingsQuery,
-  HostListingInput,
   HostListingArgs,
-  // AutoCompleteArgs,
-  // AutoCompleteResult,
-  // CityAndAdmin,
-  // CityAndAdminResults
-} from "./types";
+  HostListingInput,
+} from './types';
 
-const verifyHostListingInput = ({
-  title,
-  description,
-  type,
-  price,
-}: HostListingInput) => {
+const verifyHostListingInput = ({ title, description, type, price }: HostListingInput) => {
   if (title.length > 100) {
-    throw new Error("listing title must be under 100 characters");
+    throw new Error('listing title must be under 100 characters');
   }
   if (description.length > 5000) {
-    throw new Error("listing description must be under 5000 characters");
+    throw new Error('listing description must be under 5000 characters');
   }
   if (type !== ListingType.Apartment && type !== ListingType.House) {
-    throw new Error("listing type must be either appartment or house");
+    throw new Error('listing type must be either an apartment or house');
   }
   if (price < 0) {
-    throw new Error("price must be greater than 0");
+    throw new Error('price must be greater than 0');
   }
 };
 
@@ -45,35 +36,35 @@ export const listingResolvers: IResolvers = {
     listing: async (
       _root: undefined,
       { id }: ListingArgs,
-      { db, req }: { db: Database; req: Request }
+      { db, req }: { db: Database; req: Request },
     ): Promise<Listing> => {
-      console.log("id", id);
       try {
         const listing = await db.listings.findOne({ _id: new ObjectId(id) });
         if (!listing) {
-          throw new Error("listings can't be found");
+          throw new Error("listing can't be found");
         }
 
         const viewer = await authorize(db, req);
         if (viewer && viewer._id === listing.host) {
           listing.authorized = true;
         }
+
         return listing;
       } catch (error) {
-        throw new Error(`Failed to query listings : ${error}`);
+        throw new Error(`Failed to query listing: ${error}`);
       }
     },
     listings: async (
       _root: undefined,
       { location, filter, limit, page }: ListingsArgs,
-      { db }: { db: Database }
+      { db }: { db: Database },
     ): Promise<ListingsData> => {
       try {
         const query: ListingsQuery = {};
         const data: ListingsData = {
+          region: null,
           total: 0,
           result: [],
-          region: null,
         };
 
         if (location) {
@@ -84,10 +75,11 @@ export const listingResolvers: IResolvers = {
           if (country) {
             query.country = country;
           } else {
-            throw new Error("no country found");
+            throw new Error('no country found');
           }
-          const cityText = city ? `${city}, ` : "";
-          const adminText = admin ? `${admin}, ` : "";
+
+          const cityText = city ? `${city}, ` : '';
+          const adminText = admin ? `${admin}, ` : '';
           data.region = `${cityText}${adminText}${country}`;
         }
 
@@ -109,7 +101,7 @@ export const listingResolvers: IResolvers = {
 
         return data;
       } catch (error) {
-        throw new Error(`Failed to query listings: ${error}`);
+        throw new Error(`Failed to query user listings: ${error}`);
       }
     },
   },
@@ -117,41 +109,38 @@ export const listingResolvers: IResolvers = {
     hostListing: async (
       _root: undefined,
       { input }: HostListingArgs,
-      { db, req }: { db: Database; req: Request }
+      { db, req }: { db: Database; req: Request },
     ): Promise<Listing> => {
       verifyHostListingInput(input);
 
-      // eslint-disable-next-line prefer-const
-      let viewer = await authorize(db, req);
+      const viewer = await authorize(db, req);
       if (!viewer) {
-        throw new Error("viewer cannot be found");
-      }
-      const { country, admin, city } = await Google.geocode(input.address);
-      if (!country || !admin || !city) {
-        throw new Error("invalid address input");
+        throw new Error('viewer cannot be found');
       }
 
-      // const imageUrl = await Cloudinary.upload(input.image);
-      // console.log("imageUrl", imageUrl);
+      const { country, admin, city } = await Google.geocode(input.address);
+      if (!country || !admin || !city) {
+        throw new Error('invalid address input');
+      }
+
+      const imageUrl = await Cloudinary.upload(input.image);
 
       const insertResult = await db.listings.insertOne({
         _id: new ObjectId(),
         ...input,
-        // image: imageUrl,
+        image: imageUrl,
         bookings: [],
         bookingsIndex: {},
         country,
         admin,
         city,
-        host: viewer._id, //reference the user id(viewer)
+        host: viewer._id,
       });
 
       const insertedListing: Listing = insertResult.ops[0];
 
-      await db.users.updateOne(
-        { _id: viewer._id },
-        { $push: { listings: insertedListing._id } }
-      );
+      await db.users.updateOne({ _id: viewer._id }, { $push: { listings: insertedListing._id } });
+
       return insertedListing;
     },
   },
@@ -159,11 +148,7 @@ export const listingResolvers: IResolvers = {
     id: (listing: Listing): string => {
       return listing._id.toString();
     },
-    host: async (
-      listing: Listing,
-      _args: {},
-      { db }: { db: Database }
-    ): Promise<User> => {
+    host: async (listing: Listing, _args: any, { db }: { db: Database }): Promise<User> => {
       const host = await db.users.findOne({ _id: listing.host });
       if (!host) {
         throw new Error("host can't be found");
@@ -176,7 +161,7 @@ export const listingResolvers: IResolvers = {
     bookings: async (
       listing: Listing,
       { limit, page }: ListingBookingsArgs,
-      { db }: { db: Database }
+      { db }: { db: Database },
     ): Promise<ListingBookingsData | null> => {
       try {
         if (!listing.authorized) {
@@ -187,7 +172,7 @@ export const listingResolvers: IResolvers = {
           total: 0,
           result: [],
         };
-        // Find all ids in listing.bookings(listing being passed in as args) -> returns array of bookings
+
         let cursor = await db.bookings.find({
           _id: { $in: listing.bookings },
         });
