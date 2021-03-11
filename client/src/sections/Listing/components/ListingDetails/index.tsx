@@ -1,45 +1,26 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Avatar, Divider, Tag, Typography } from "antd";
-import { EnvironmentOutlined } from "@ant-design/icons";
-
-import { Listing as ListingData } from "../../../../lib/graphql/queries/Listing/__generated__/Listing";
-import { iconColor } from "../../../../lib/utils";
+import { Link } from 'react-router-dom';
+import { Avatar, Divider, Tag, Typography } from 'antd';
+import { EnvironmentOutlined } from '@ant-design/icons';
+import { Listing as ListingData } from '../../../../lib/graphql/queries/Listing/__generated__/Listing';
+import { iconColor } from '../../../../lib/utils';
 
 interface Props {
-    listing: ListingData["listing"];
+  listing: ListingData['listing'];
 }
 
 const { Paragraph, Title } = Typography;
 
 export const ListingDetails = ({ listing }: Props) => {
-  const {
-    title,
-    description,
-    image,
-    type,
-    address,
-    city,
-    numOfGuests,
-    host,
-  } = listing;
+  const { title, description, image, type, address, city, numOfGuests, host } = listing;
 
   return (
     <div className="listing-details">
-      <div
-        style={{ backgroundImage: `url(${image})` }}
-        className="listing-details__image"
-      />
+      <div style={{ backgroundImage: `url(${image})` }} className="listing-details__image" />
 
       <div className="listing-details__information">
-        <Paragraph
-          type="secondary"
-          ellipsis
-          className="listing-details__city-address"
-        >
+        <Paragraph type="secondary" ellipsis className="listing-details__city-address">
           <Link to={`/listings/${city}`}>
-            <EnvironmentOutlined style={{ color: iconColor }} />
-            {city}
+            <EnvironmentOutlined style={{ color: iconColor }} /> {city}
           </Link>
           <Divider type="vertical" />
           {address}
@@ -68,9 +49,7 @@ export const ListingDetails = ({ listing }: Props) => {
           <Tag color="magenta">{type}</Tag>
           <Tag color="magenta">{numOfGuests} Guests</Tag>
         </div>
-        <Paragraph ellipsis={{ rows: 3, expandable: true }}>
-          {description}
-        </Paragraph>
+        <Paragraph ellipsis={{ rows: 3, expandable: true }}>{description}</Paragraph>
       </div>
     </div>
   );

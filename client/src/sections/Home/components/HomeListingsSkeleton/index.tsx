@@ -1,7 +1,6 @@
-import React from "react";
-import { Card, List, Skeleton } from "antd";
+import { Card, List, Skeleton } from 'antd';
 
-import listingLoadingCardCover from "../../assets/listing-loading-card-cover.jpg";
+import listingLoadingCardCover from '../../assets/listing-loading-card-cover.jpg';
 
 export const HomeListingsSkeleton = () => {
   const emptyData = [{}, {}, {}, {}];
@@ -14,7 +13,7 @@ export const HomeListingsSkeleton = () => {
           gutter: 8,
           xs: 1,
           sm: 2,
-          lg: 4
+          lg: 4,
         }}
         dataSource={emptyData}
         renderItem={() => (

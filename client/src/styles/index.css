@@ -1,5 +1,4 @@
 @import "~antd/dist/antd.css";
-@import "~antd/dist/antd.css";
 @import url(https://fonts.googleapis.com/css?family=Sacramento);
 .menu {
   width: 100%;
@@ -206,7 +205,7 @@
 }
 .home {
   padding: 60px 120px;
-  background-image: url(/static/media/map-background.c21df147.jpg);
+  background-image: url(./map-background.jpg);
   background-repeat: no-repeat;
   background-position: 10% 0;
 }
@@ -440,9 +439,7 @@
   padding: 10px 0;
   background: #fff;
 }
-.listings-filters
-  .ant-select-selection--single
-  .ant-select-selection__rendered {
+.listings-filters .ant-select-selection--single .ant-select-selection__rendered {
   margin-right: 30px;
 }
 .listings-filters span {

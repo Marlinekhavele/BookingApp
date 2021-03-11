@@ -15,7 +15,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import {
   AppHeader,
   Home,
-  WrappedHost as Host,
+  Host,
   Listing, Listings, Login, NotFound, Stripe, User
 } from "./sections";
 import {LOG_IN} from "./lib/graphql/mutations";
